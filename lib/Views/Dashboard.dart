@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:plant_diary/Config/Colors.dart';
+import 'package:plant_diary/Views/MyGarden.dart';
 import 'package:plant_diary/Widgets/ImageCardsScroll.dart';
 import 'package:plant_diary/Widgets/NewImageCard.dart';
 import 'package:plant_diary/Widgets/SearchBarWidget.dart';
 import 'package:plant_diary/Widgets/BoxTitle.dart';
 import 'package:plant_diary/Widgets/ShowTips.dart';
+
+import '../Utils/Navigation.dart';
 
 class Dashboard extends StatelessWidget {
   Dashboard({super.key});
@@ -172,13 +175,22 @@ class Dashboard extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(15),
                                 color: AppColors.secoundry,
                               ),
-                              child: const Column(
+                              child: Column(
                                 children: [
                                   Row(
                                     children: [
-                                      BoxTitle(
+                                      GestureDetector(
+                                        onHorizontalDragDown: (x) =>
+                                            navigateToNewScreen(
+                                                context, const MyGarden()),
+                                        onTap: () => navigateToNewScreen(
+                                            context, const MyGarden()),
+                                        child: const BoxTitle(
                                           icon: Icons.local_florist,
-                                          title: "My Garden"),
+                                          title: "My Garden",
+                                          secondIcon: Icons.navigate_next,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ],
@@ -249,8 +261,10 @@ class Dashboard extends StatelessWidget {
                             Row(
                               children: [
                                 BoxTitle(
-                                    icon: Icons.spa,
-                                    title: "Trending in Jordan"),
+                                  icon: Icons.spa,
+                                  title: "Trending in Jordan",
+                                  secondIcon: Icons.navigate_next,
+                                ),
                               ],
                             ),
                             Row()

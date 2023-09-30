@@ -52,7 +52,7 @@ class NewImageCard extends StatelessWidget {
                   end: Alignment.bottomRight,
                   colors: [
                     AppColors.contrast.withOpacity(0.5),
-                    AppColors.contrast.withOpacity(0.3),
+                    AppColors.main.withOpacity(0.3),
                   ],
                 ),
                 child: Center(
@@ -60,6 +60,12 @@ class NewImageCard extends StatelessWidget {
                   Icons.add,
                   color: AppColors.contrast,
                   size: screenHeight * 0.0512,
+                  shadows: [
+                    Shadow(
+                        color: Colors.black87.withOpacity(0.3),
+                        offset: const Offset(0, 3),
+                        blurRadius: 6)
+                  ],
                 )),
               ),
             ),
