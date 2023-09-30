@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:plant_diary/Config/Colors.dart';
 import 'package:plant_diary/Utils/Navigation.dart';
-import 'package:plant_diary/Views/Dashboard.dart';
+import 'package:plant_diary/Views/LayoutPage.dart';
 import 'package:plant_diary/Views/Register.dart';
 import 'package:plant_diary/Widgets/StyledFormTextField.dart';
 
@@ -85,7 +85,11 @@ class Login extends StatelessWidget {
                         height: marginY * 1.4,
                         child: ElevatedButton(
                           onPressed: () =>
-                              navigateToNewScreen(context, Dashboard()),
+                              Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (context) => LayoutPage()),
+                            (route) => false,
+                          ),
                           style: ElevatedButton.styleFrom(
                             foregroundColor: Colors.white60,
                             backgroundColor: AppColors.main,

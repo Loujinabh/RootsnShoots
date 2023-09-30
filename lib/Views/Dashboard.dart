@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:plant_diary/Config/Colors.dart';
-import 'package:plant_diary/Views/MyGarden.dart';
+import 'package:plant_diary/Views/Settings.dart';
 import 'package:plant_diary/Widgets/ImageCardsScroll.dart';
 import 'package:plant_diary/Widgets/NewImageCard.dart';
 import 'package:plant_diary/Widgets/SearchBarWidget.dart';
@@ -11,7 +11,8 @@ import 'package:plant_diary/Widgets/ShowTips.dart';
 import '../Utils/Navigation.dart';
 
 class Dashboard extends StatelessWidget {
-  Dashboard({super.key});
+  final Function(int) navigateCallback;
+  Dashboard({super.key, required this.navigateCallback});
 
   final String name = "Loujin AbuHejleh";
   final List<String> tips = [
@@ -124,7 +125,10 @@ class Dashboard extends StatelessWidget {
                                 colorFilter: ColorFilter.mode(
                                     AppColors.main, BlendMode.srcIn)),
                           ),
-                          onPressed: () => {},
+                          onPressed: () => navigateToNewScreen(
+                            context,
+                            const Settings(),
+                          ),
                         ),
                       ],
                     ),
@@ -180,11 +184,7 @@ class Dashboard extends StatelessWidget {
                                   Row(
                                     children: [
                                       GestureDetector(
-                                        onHorizontalDragDown: (x) =>
-                                            navigateToNewScreen(
-                                                context, const MyGarden()),
-                                        onTap: () => navigateToNewScreen(
-                                            context, const MyGarden()),
+                                        onTap: () => navigateCallback(1),
                                         child: const BoxTitle(
                                           icon: Icons.local_florist,
                                           title: "My Garden",
@@ -215,10 +215,13 @@ class Dashboard extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  const Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 4),
-                                    child: NewImageCard(),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 4),
+                                    child: NewImageCard(
+                                      height: screenHeight * 0.1846,
+                                      width: screenWidth * 0.3364,
+                                    ),
                                   )
                                 ],
                               ),

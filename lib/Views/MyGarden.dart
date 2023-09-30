@@ -4,8 +4,13 @@ import 'package:plant_diary/Config/Colors.dart';
 import 'package:plant_diary/Widgets/ImageCardsScroll.dart';
 import 'package:plant_diary/Widgets/NewImageCard.dart';
 
+import '../Utils/Navigation.dart';
+import 'Settings.dart';
+
 class MyGarden extends StatelessWidget {
-  const MyGarden({super.key});
+  final Function() navigateBackCallback;
+
+  const MyGarden({super.key, required this.navigateBackCallback});
 
   final String name = "Loujin AbuHejleh";
 
@@ -116,7 +121,10 @@ class MyGarden extends StatelessWidget {
                                   colorFilter: ColorFilter.mode(
                                       AppColors.main, BlendMode.srcIn)),
                             ),
-                            onPressed: () => {},
+                            onPressed: () => navigateToNewScreen(
+                              context,
+                              const Settings(),
+                            ),
                           ),
                         ],
                       ),
@@ -129,10 +137,13 @@ class MyGarden extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.keyboard_double_arrow_left,
-                    color: AppColors.secoundry,
-                    size: screenHeight * 0.045,
+                  GestureDetector(
+                    onTap: navigateBackCallback,
+                    child: Icon(
+                      Icons.keyboard_double_arrow_left,
+                      color: AppColors.secoundry,
+                      size: screenHeight * 0.045,
+                    ),
                   ),
                   Text(
                     "My Garden",
@@ -140,14 +151,6 @@ class MyGarden extends StatelessWidget {
                       fontSize: screenHeight * 0.037,
                       fontWeight: FontWeight.w900,
                       color: AppColors.contrast,
-                      shadows: [
-                        Shadow(
-                          color:
-                              AppColors.main.withOpacity(0.8), // Shadow color
-                          offset: const Offset(0, 2), // Offset from the text
-                          blurRadius: 3, // Shadow blur radius
-                        ),
-                      ],
                     ),
                   ),
                 ],
@@ -155,20 +158,31 @@ class MyGarden extends StatelessWidget {
             ),
             Expanded(
               child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                padding: EdgeInsets.only(bottom: screenHeight * 0.02),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2, // Number of columns
-                  childAspectRatio: 1.0, // Aspect ratio of each grid item
+                  childAspectRatio: 0.8, // Aspect ratio of each grid item
+                  mainAxisSpacing: screenHeight * 0.01,
                 ),
                 // itemCount: list.length,
                 itemCount: 27,
                 itemBuilder: (context, index) {
                   // if (index == list.length - 1) {
                   if (index == 26) {
-                    return const NewImageCard();
+                    return Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
+                      child: NewImageCard(
+                        height: double.infinity,
+                        width: double.infinity,
+                        iconSize: screenHeight * 0.075,
+                      ),
+                    );
                   }
-                  return const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: ImageCardsScroll(
+                  return Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
+                    child: const ImageCardsScroll(
                       plantImage: "assets/images/background.jpg",
                       plantName: "XY",
                     ),
