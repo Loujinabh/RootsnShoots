@@ -275,6 +275,26 @@ class Dashboard extends StatelessWidget {
                         ),
                       ),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 21),
+                      child: Container(
+                        height: screenHeight * 0.25,
+                        width: screenWidth * 0.9253,
+                        padding: const EdgeInsets.only(top: 20),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          color: AppColors.secoundry,
+                        ),
+                        child: const Column(
+                          children: [
+                            Row(
+                              children: [Text("LALLALALA")],
+                            ),
+                            Row()
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

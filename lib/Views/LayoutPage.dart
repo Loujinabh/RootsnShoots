@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:plant_diary/Config/Colors.dart';
 import 'package:plant_diary/Views/Dashboard.dart';
 import 'package:plant_diary/Views/MyGarden.dart';
+import 'package:plant_diary/Views/Diagnose.dart';
 
 class LayoutPage extends StatefulWidget {
   @override
@@ -38,6 +39,7 @@ class _LayoutPageState extends State<LayoutPage> {
   Widget build(BuildContext context) {
     final List<Widget> tabs = [
       Dashboard(navigateCallback: navigate),
+      const Diagnose(),
       MyGarden(
         navigateBackCallback: navigateBack,
       ),
@@ -64,6 +66,8 @@ class _LayoutPageState extends State<LayoutPage> {
       child: Scaffold(
         body: tabs[_currentIndex],
         bottomNavigationBar: BottomNavigationBar(
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
           backgroundColor: AppColors.main,
           selectedItemColor: AppColors.contrast,
           currentIndex: _currentIndex,
@@ -72,6 +76,10 @@ class _LayoutPageState extends State<LayoutPage> {
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.medical_services),
+              label: 'Diagnose',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.local_florist),
