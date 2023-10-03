@@ -3,6 +3,7 @@ import 'package:plant_diary/Config/Colors.dart';
 import 'package:plant_diary/Views/Dashboard.dart';
 import 'package:plant_diary/Views/MyGarden.dart';
 import 'package:plant_diary/Views/Diagnose.dart';
+import 'package:plant_diary/Views/PlantPage.dart';
 
 class LayoutPage extends StatefulWidget {
   @override
@@ -40,6 +41,7 @@ class _LayoutPageState extends State<LayoutPage> {
     final List<Widget> tabs = [
       Dashboard(navigateCallback: navigate),
       const Diagnose(),
+      const PlantPage(),
       MyGarden(
         navigateBackCallback: navigateBack,
       ),
@@ -68,21 +70,56 @@ class _LayoutPageState extends State<LayoutPage> {
         bottomNavigationBar: BottomNavigationBar(
           showSelectedLabels: false,
           showUnselectedLabels: false,
-          backgroundColor: AppColors.main,
           selectedItemColor: AppColors.contrast,
           currentIndex: _currentIndex,
           onTap: (int index) => navigate(index),
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
+              backgroundColor: AppColors.main,
+              icon: Icon(
+                Icons.home,
+                color: AppColors.iconcolor,
+              ),
+              activeIcon: Icon(
+                Icons.home,
+                color: AppColors.contrast,
+              ),
               label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.medical_services),
+              backgroundColor: AppColors.main,
+              icon: Icon(
+                Icons.medical_services,
+                color: AppColors.iconcolor,
+              ),
+              activeIcon: Icon(
+                Icons.medical_services,
+                color: AppColors.contrast,
+              ),
               label: 'Diagnose',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.local_florist),
+              backgroundColor: AppColors.main,
+              icon: Icon(
+                Icons.tab,
+                color: AppColors.iconcolor,
+              ),
+              activeIcon: Icon(
+                Icons.tab,
+                color: AppColors.contrast,
+              ),
+              label: 'Plant',
+            ),
+            BottomNavigationBarItem(
+              backgroundColor: AppColors.main,
+              icon: Icon(
+                Icons.local_florist,
+                color: AppColors.iconcolor,
+              ),
+              activeIcon: Icon(
+                Icons.local_florist,
+                color: AppColors.contrast,
+              ),
               label: 'My Garden',
             ),
           ],

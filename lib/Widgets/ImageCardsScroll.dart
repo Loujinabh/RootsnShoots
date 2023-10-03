@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:plant_diary/Config/Colors.dart';
 
 class ImageCardsScroll extends StatelessWidget {
+  final double? height;
+  final double? width;
   final String plantImage;
   final String plantName;
 
@@ -9,6 +11,8 @@ class ImageCardsScroll extends StatelessWidget {
     required this.plantImage,
     required this.plantName,
     super.key,
+    this.height,
+    this.width,
   });
 
   @override
@@ -18,8 +22,8 @@ class ImageCardsScroll extends StatelessWidget {
     return GestureDetector(
       onTap: () => {},
       child: Container(
-        height: screenHeight * 0.1846,
-        width: screenWidth * 0.3364,
+        height: height ?? screenHeight * 0.1846,
+        width: width ?? screenWidth * 0.3364,
         decoration: BoxDecoration(
           color: AppColors.main,
           border: Border.all(
