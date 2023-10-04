@@ -272,6 +272,7 @@ class Dashboard extends StatelessWidget {
                             color: AppColors.secoundry,
                           ),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 mainAxisAlignment:
@@ -304,7 +305,7 @@ class Dashboard extends StatelessWidget {
                                   thickness: 1.0,
                                 ),
                               ),
-                              ShowTips(tips: tips)
+                              const ShowTips()
                             ],
                           )),
                     ),

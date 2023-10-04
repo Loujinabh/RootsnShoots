@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "249102798810",
-    "project_id": "plant-diary-a9a25",
-    "storage_bucket": "plant-diary-a9a25.appspot.com"
+    "project_number": "265330569973",
+    "project_id": "plant-b1185",
+    "storage_bucket": "plant-b1185.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:249102798810:android:0cd4af58d9c32ed7493ae3",
+        "mobilesdk_app_id": "1:265330569973:android:56a03acf0d71b236a78bbc",
         "android_client_info": {
           "package_name": "com.example.plant_diary"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBguImKyfcX1C7HKZmRblX7P-XFaqSLnCc"
+          "current_key": "AIzaSyDl1emN4fd9umyl1wLeYS1JEkEG5ibfALI"
         }
       ],
       "services": {
