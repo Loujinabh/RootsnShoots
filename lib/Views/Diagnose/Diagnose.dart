@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:plant_diary/Config/Colors.dart';
 
-import '../Utils/Navigation.dart';
-import '../Widgets/BoxTitle.dart';
-import '../Widgets/ImageCardsScroll.dart';
-import 'Settings.dart';
+import '../../Utils/Navigation.dart';
+import '../../Widgets/Titles/BoxTitle.dart';
+import '../../Widgets/ImageCards/ImageCardsScroll.dart';
+import '../Settings/Settings.dart';
 
 class Diagnose extends StatelessWidget {
   const Diagnose({
@@ -225,11 +225,12 @@ class Diagnose extends StatelessWidget {
                       children: [
                         ...List.generate(
                           4,
-                          (index) => const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 4),
+                          (index) => Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
                             child: ImageCardsScroll(
                               plantName: 'xx',
                               plantImage: "assets/images/background.jpg",
+                              onTap: () => {},
                             ),
                           ),
                         ),

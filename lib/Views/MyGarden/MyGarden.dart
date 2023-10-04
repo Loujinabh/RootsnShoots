@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:plant_diary/Config/Colors.dart';
-import 'package:plant_diary/Widgets/ImageCardsScroll.dart';
-import 'package:plant_diary/Widgets/NewImageCard.dart';
+import 'package:plant_diary/MockAPI/MockPlants.dart';
+import 'package:plant_diary/Utils/PlantModel.dart';
+import 'package:plant_diary/Views/MyGarden/PlantPage.dart';
+import 'package:plant_diary/Widgets/ImageCards/ImageCardsScroll.dart';
+import 'package:plant_diary/Widgets/ImageCards/NewImageCard.dart';
 
-import '../Utils/Navigation.dart';
-import 'Settings.dart';
+import '../../Utils/Navigation.dart';
+import '../Settings/Settings.dart';
 
 class MyGarden extends StatelessWidget {
   final Function() navigateBackCallback;
 
-  const MyGarden({super.key, required this.navigateBackCallback});
+  MyGarden({super.key, required this.navigateBackCallback});
 
+  // API Vars
   final String name = "Loujin AbuHejleh";
+  final List<PlantModel> myGarden = MockPlants.myGarden;
+
+  //
 
   @override
   Widget build(BuildContext context) {
@@ -160,15 +167,13 @@ class MyGarden extends StatelessWidget {
               child: GridView.builder(
                 padding: EdgeInsets.only(bottom: screenHeight * 0.02),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // Number of columns
-                  childAspectRatio: 0.8, // Aspect ratio of each grid item
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.8,
                   mainAxisSpacing: screenHeight * 0.01,
                 ),
-                // itemCount: list.length,
-                itemCount: 27,
+                itemCount: myGarden.length,
                 itemBuilder: (context, index) {
-                  // if (index == list.length - 1) {
-                  if (index == 26) {
+                  if (index == myGarden.length - 1) {
                     return Padding(
                       padding:
                           EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
@@ -176,15 +181,22 @@ class MyGarden extends StatelessWidget {
                         height: double.infinity,
                         width: double.infinity,
                         iconSize: screenHeight * 0.075,
+                        onTap: () => {},
                       ),
                     );
                   }
                   return Padding(
                     padding:
                         EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
-                    child: const ImageCardsScroll(
-                      plantImage: "assets/images/background.jpg",
-                      plantName: "XY",
+                    child: ImageCardsScroll(
+                      plantName: myGarden[index].name,
+                      plantImage: myGarden[index].imageSrc,
+                      onTap: () => navigateToNewScreen(
+                        context,
+                        PlantPage(
+                          plant: myGarden[index],
+                        ),
+                      ),
                     ),
                   );
                 },

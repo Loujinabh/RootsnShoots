@@ -8,13 +8,15 @@ class StyledFormTextField extends StatelessWidget {
   final bool isHidden;
   final IconData? icon;
   final String hintText;
+  final String? Function(String?)? validator;
 
   const StyledFormTextField(
       {super.key,
       required this.controller,
       required this.isHidden,
       this.icon,
-      required this.hintText});
+      required this.hintText,
+      this.validator});
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +30,8 @@ class StyledFormTextField extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         obscureText: isHidden,
+        validator: validator,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         decoration: InputDecoration(
           prefixIcon: icon != null
               ? Icon(

@@ -2,18 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:plant_diary/Config/Colors.dart';
 import 'package:plant_diary/Utils/Navigation.dart';
-import 'package:plant_diary/Views/Login.dart';
-import 'package:plant_diary/Views/RegisterTwo.dart';
-import 'package:plant_diary/Widgets/StyledFormTextField.dart';
+import 'package:plant_diary/Views/Login/Login.dart';
+import 'package:plant_diary/Widgets/FormFields/StyledFormTextField.dart';
 
-class Register extends StatelessWidget {
-  const Register({Key? key}) : super(key: key);
+class RegisterTwo extends StatelessWidget {
+  final String name;
+  final String email;
+
+  const RegisterTwo({Key? key, required this.name, required this.email})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-
     double marginX = MediaQuery.of(context).size.width * 0.06;
     double marginY = MediaQuery.of(context).size.height * 0.035;
 
@@ -58,7 +60,7 @@ class Register extends StatelessWidget {
                   ],
                 ),
                 // Inner Content
-                child: registerStepOne(context, marginX, marginY),
+                child: registerStepTwo(context, marginX, marginY),
               ),
             ),
           ],
@@ -67,9 +69,11 @@ class Register extends StatelessWidget {
     );
   }
 
-  Widget registerStepOne(BuildContext context, double marginX, double marginY) {
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController emailController = TextEditingController();
+  Widget registerStepTwo(BuildContext context, double marginX, double marginY) {
+    final TextEditingController passwordController = TextEditingController();
+    final TextEditingController confirmPasswordController =
+        TextEditingController();
+
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: marginX,
@@ -79,27 +83,22 @@ class Register extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           StyledFormTextField(
-            controller: nameController,
+            controller: passwordController,
             isHidden: false,
             icon: Icons.person,
-            hintText: 'Name',
+            hintText: 'Password',
           ),
           StyledFormTextField(
-            controller: emailController,
+            controller: confirmPasswordController,
             isHidden: false,
             icon: Icons.email,
-            hintText: 'Email',
+            hintText: 'Confirm Password',
           ),
           SizedBox(
             width: double.infinity,
             height: marginY * 1.4,
             child: ElevatedButton(
-              onPressed: () => navigateToNewScreen(
-                  context,
-                  RegisterTwo(
-                    name: nameController.text,
-                    email: emailController.text,
-                  )),
+              onPressed: () => {},
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white60,
                 backgroundColor: AppColors.main,
@@ -107,7 +106,7 @@ class Register extends StatelessWidget {
                   borderRadius: BorderRadius.circular(25),
                 ),
               ),
-              child: const Text("NEXT STEP"),
+              child: const Text("SIGN UP"),
             ),
           ),
           Divider(
@@ -143,20 +142,21 @@ class Register extends StatelessWidget {
             ),
           ),
           SizedBox(
-              width: double.infinity,
-              height: marginY * 1.5,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: AppColors.contrast,
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
+            width: double.infinity,
+            height: marginY * 1.5,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: AppColors.contrast,
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
                 ),
-                onPressed: () => navigateToNewScreen(context, Login()),
-                child: const Text("Already have an account? Sign in"),
-              ))
+              ),
+              onPressed: () => navigateToNewScreen(context, Login()),
+              child: const Text("Already have an account? Sign in"),
+            ),
+          ),
         ],
       ),
     );

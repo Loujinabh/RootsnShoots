@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:plant_diary/Config/Colors.dart';
-import 'package:plant_diary/Views/Dashboard.dart';
-import 'package:plant_diary/Views/MyGarden.dart';
-import 'package:plant_diary/Views/Diagnose.dart';
-import 'package:plant_diary/Views/PlantPage.dart';
+import 'package:plant_diary/Views/Dashboard/Dashboard.dart';
+import 'package:plant_diary/Views/MyGarden/MyGarden.dart';
+import 'package:plant_diary/Views/Diagnose/Diagnose.dart';
 
 class LayoutPage extends StatefulWidget {
   @override
@@ -41,7 +40,6 @@ class _LayoutPageState extends State<LayoutPage> {
     final List<Widget> tabs = [
       Dashboard(navigateCallback: navigate),
       const Diagnose(),
-      const PlantPage(),
       MyGarden(
         navigateBackCallback: navigateBack,
       ),
@@ -70,6 +68,7 @@ class _LayoutPageState extends State<LayoutPage> {
         bottomNavigationBar: BottomNavigationBar(
           showSelectedLabels: false,
           showUnselectedLabels: false,
+          backgroundColor: AppColors.main,
           selectedItemColor: AppColors.contrast,
           currentIndex: _currentIndex,
           onTap: (int index) => navigate(index),
@@ -97,18 +96,6 @@ class _LayoutPageState extends State<LayoutPage> {
                 color: AppColors.contrast,
               ),
               label: 'Diagnose',
-            ),
-            BottomNavigationBarItem(
-              backgroundColor: AppColors.main,
-              icon: Icon(
-                Icons.tab,
-                color: AppColors.iconcolor,
-              ),
-              activeIcon: Icon(
-                Icons.tab,
-                color: AppColors.contrast,
-              ),
-              label: 'Plant',
             ),
             BottomNavigationBarItem(
               backgroundColor: AppColors.main,

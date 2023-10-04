@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:plant_diary/API/Auth.dart';
 import 'package:plant_diary/Config/Colors.dart';
-import 'package:plant_diary/Widgets/SettingsRow.dart';
+import 'package:plant_diary/Utils/Navigation.dart';
+import 'package:plant_diary/Views/Login/Login.dart';
+import 'package:plant_diary/Widgets/PageHelpers/SettingsRow.dart';
 
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);
@@ -257,6 +260,14 @@ class _SettingsState extends State<Settings> {
                         SettingsRow(
                           title: "Terms & Services",
                           buttonFunction: () {},
+                        ),
+                        SettingsRow(
+                          title: "Log Out",
+                          buttonFunction: () {
+                            signOut();
+                            Navigator.of(context).popUntil((route) => false);
+                            navigateToNewScreen(context, Login());
+                          },
                         ),
                       ],
                     ),

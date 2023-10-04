@@ -4,13 +4,17 @@ import 'package:plant_diary/Config/Colors.dart';
 class BoxTitle extends StatelessWidget {
   final IconData icon;
   final String title;
+  final Color? color;
   final IconData? secondIcon;
+  final MainAxisAlignment? alignment;
 
   const BoxTitle({
+    super.key,
     required this.icon,
     required this.title,
     this.secondIcon,
-    super.key,
+    this.color,
+    this.alignment,
   });
 
   @override
@@ -19,7 +23,7 @@ class BoxTitle extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 10, bottom: 12),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: alignment ?? MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
@@ -33,9 +37,9 @@ class BoxTitle extends StatelessWidget {
                 child: Text(
                   title,
                   style: TextStyle(
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.bold,
                     fontSize: screenHeight * 0.02,
-                    color: AppColors.contrast,
+                    color: color ?? AppColors.contrast,
                   ),
                 ),
               ),
@@ -44,7 +48,7 @@ class BoxTitle extends StatelessWidget {
           if (secondIcon != null)
             Icon(
               secondIcon,
-              color: AppColors.iconcolor,
+              color: color ?? AppColors.iconcolor,
               size: screenHeight * 0.03,
             ),
         ],

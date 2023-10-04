@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
+import 'package:plant_diary/API/Auth.dart';
 import 'package:plant_diary/Config/Colors.dart';
 import 'package:plant_diary/Utils/Navigation.dart';
-import 'package:plant_diary/Views/LayoutPage.dart';
-import 'package:plant_diary/Views/Register.dart';
-import 'package:plant_diary/Widgets/StyledFormTextField.dart';
+import 'package:plant_diary/Views/Register/Register.dart';
+import 'package:plant_diary/Widgets/FormFields/StyledFormTextField.dart';
 
 class Login extends StatelessWidget {
   Login({super.key});
@@ -84,12 +84,22 @@ class Login extends StatelessWidget {
                         width: double.infinity,
                         height: marginY * 1.4,
                         child: ElevatedButton(
-                          onPressed: () =>
-                              Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (context) => LayoutPage()),
-                            (route) => false,
-                          ),
+                          onPressed: () async {
+                            int statusCode = await signIn(
+                              context,
+                              emailController.text.trim(),
+                              passwordController.text.trim(),
+                            );
+                            if (statusCode != 200) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Center(
+                                      child: Text(
+                                          "Email or Password are incorrect")),
+                                ),
+                              );
+                            }
+                          },
                           style: ElevatedButton.styleFrom(
                             foregroundColor: Colors.white60,
                             backgroundColor: AppColors.main,
@@ -149,7 +159,7 @@ class Login extends StatelessWidget {
                               ),
                             ),
                             onPressed: () =>
-                                navigateToNewScreen(context, const Register()),
+                                navigateToNewScreen(context, Register()),
                             child: const Text("Don't have an account? Sign up"),
                           ))
                     ],
