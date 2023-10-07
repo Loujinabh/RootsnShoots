@@ -4,7 +4,7 @@ import 'package:plant_diary/Config/Colors.dart';
 import 'package:plant_diary/MockAPI/MockPlants.dart';
 import 'package:plant_diary/MockAPI/MockTips.dart';
 import 'package:plant_diary/Utils/DateFormatter.dart';
-import 'package:plant_diary/Utils/GetWeather.dart';
+import 'package:plant_diary/API/GetWeather.dart';
 import 'package:plant_diary/Utils/PlantModel.dart';
 import 'package:plant_diary/Views/MyGarden/PlantPage.dart';
 import 'package:plant_diary/Views/Settings/Settings.dart';

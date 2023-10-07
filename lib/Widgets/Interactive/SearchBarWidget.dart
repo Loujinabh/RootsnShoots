@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:plant_diary/API/DataModels/SearchPlantModel.dart';
+import 'package:plant_diary/API/PlantSearchApi.dart';
 import 'package:plant_diary/Config/Colors.dart';
+import 'package:plant_diary/Utils/Debounced.dart';
 
 class SearchBarWidget extends StatefulWidget {
   const SearchBarWidget({super.key});
@@ -9,6 +12,9 @@ class SearchBarWidget extends StatefulWidget {
 }
 
 class _SearchBarWidgetState extends State<SearchBarWidget> {
+  final Debounced _debounced = Debounced(250);
+  List<SearchPlantModel> searchList = [];
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -36,11 +42,16 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                     AppColors.main.withAlpha(38)),
                 padding: const MaterialStatePropertyAll<EdgeInsets>(
                     EdgeInsets.symmetric(horizontal: 16.0)),
-                onTap: () {
-                  controller.openView();
-                },
+                // onTap: () {
+                //   controller.openView();
+                // },
                 onChanged: (_) {
-                  controller.openView();
+                  String searchText = controller.text;
+                  _debounced.run(
+                    () async {
+                      searchList = await searchPlant(searchText);
+                    },
+                  );
                 },
                 leading: Icon(
                   Icons.search,
@@ -66,13 +77,14 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
         },
         suggestionsBuilder:
             (BuildContext context, SearchController controller) {
-          return List<ListTile>.generate(5, (int index) {
-            final String item = 'item $index';
+          return List<ListTile>.generate(searchList.length, (int index) {
+            final String item = searchList[index].scientific_name;
             return ListTile(
               title: Text(item),
               onTap: () {
                 setState(() {
                   controller.closeView(item);
+                  // Function to Creation page
                 });
               },
             );
