@@ -196,9 +196,10 @@ class PlantPage extends StatelessWidget {
                   ),
                   child: Padding(
                     padding: EdgeInsets.only(
-                        top: marginY * 2,
-                        left: marginX * 1.5,
-                        right: marginX * 1.5),
+                      top: marginY * 2,
+                      left: marginX * 1.5,
+                      right: marginX * 1.5,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
