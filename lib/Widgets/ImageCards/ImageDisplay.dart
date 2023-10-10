@@ -5,11 +5,9 @@ class ImageDisplay extends StatelessWidget {
   final double? height;
   final double? width;
   final String plantImage;
-  final String plantName;
 
   const ImageDisplay({
     required this.plantImage,
-    required this.plantName,
     super.key,
     this.height,
     this.width,
@@ -29,32 +27,51 @@ class ImageDisplay extends StatelessWidget {
           width: 1,
         ),
         borderRadius: BorderRadius.circular(10),
-        image: DecorationImage(
-          fit: BoxFit.cover,
-          image: AssetImage(plantImage),
-        ),
       ),
-      child: Stack(
-        children: [
-          Positioned(
-            left: 10, // Adjust the left position as needed
-            bottom: 10, // Adjust the bottom position as needed
-            child: Container(
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                color: AppColors.gray.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Text(
-                plantName,
-                style: TextStyle(
-                  color: AppColors.contrast,
-                  fontSize: screenHeight * 0.02,
-                ),
-              ),
-            ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: SizedBox(
+          height: height ?? screenHeight * 0.1846,
+          width: width ?? screenWidth * 0.3364,
+          child: Image.network(
+            plantImage,
+            fit: BoxFit.cover,
+            loadingBuilder: (BuildContext context, Widget child,
+                ImageChunkEvent? loadingProgress) {
+              try {
+                if (loadingProgress == null) {
+                  return child;
+                }
+                return Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.contrast,
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                        : null,
+                  ),
+                );
+              } catch (e) {
+                return Container(
+                  height: screenHeight * 0.2,
+                  width: screenWidth * 0.2,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: AppColors.main),
+                  child: Center(
+                    child: Text(
+                      "No Image",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.contrast,
+                      ),
+                    ),
+                  ),
+                );
+              }
+            },
           ),
-        ],
+        ),
       ),
     );
   }

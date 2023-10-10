@@ -1,25 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:plant_diary/API/DataModels/PlantDetailsModel.dart';
+import 'package:plant_diary/API/PlantDiaryApi.dart';
 import 'package:plant_diary/Config/Colors.dart';
-import 'package:plant_diary/MockAPI/MockPlants.dart';
-import 'package:plant_diary/Utils/PlantModel.dart';
 import 'package:plant_diary/Views/MyGarden/PlantPage.dart';
 import 'package:plant_diary/Widgets/ImageCards/ImageCardsScroll.dart';
 import 'package:plant_diary/Widgets/ImageCards/NewImageCard.dart';
-
 import '../../Utils/Navigation.dart';
 import '../Settings/Settings.dart';
 
-class MyGarden extends StatelessWidget {
+class MyGarden extends StatefulWidget {
   final Function() navigateBackCallback;
 
   MyGarden({super.key, required this.navigateBackCallback});
 
+  @override
+  _MyGardenState createState() => _MyGardenState();
+}
+
+class _MyGardenState extends State<MyGarden> {
   // API Vars
   final String name = "Loujin AbuHejleh";
-  final List<PlantModel> myGarden = MockPlants.myGarden;
+  List<PlantDetailsModel> myGarden = [
+    PlantDetailsModel(
+      plantName: "",
+      plantScientificName: "",
+      plantOtherNames: [],
+      description: "",
+      keyFacts: [],
+      plantCharacteristics: [],
+      floweringSeason: "",
+      difficulty: "",
+      imageSrc: "",
+    ),
+  ];
 
   //
+  Future<List<PlantDetailsModel>> getList() async {
+    var plants = await PlantDiaryApi.getPlantsByUserId();
+    myGarden = plants;
+    return plants;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -145,7 +166,7 @@ class MyGarden extends StatelessWidget {
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap: navigateBackCallback,
+                    onTap: widget.navigateBackCallback,
                     child: Icon(
                       Icons.keyboard_double_arrow_left,
                       color: AppColors.secoundry,
@@ -163,45 +184,59 @@ class MyGarden extends StatelessWidget {
                 ],
               ),
             ),
-            Expanded(
-              child: GridView.builder(
-                padding: EdgeInsets.only(bottom: screenHeight * 0.02),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.8,
-                  mainAxisSpacing: screenHeight * 0.01,
-                ),
-                itemCount: myGarden.length,
-                itemBuilder: (context, index) {
-                  if (index == myGarden.length - 1) {
-                    return Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
-                      child: NewImageCard(
-                        height: double.infinity,
-                        width: double.infinity,
-                        iconSize: screenHeight * 0.075,
-                        onTap: () => {},
+            FutureBuilder<List<PlantDetailsModel>>(
+                future: getList(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.contrast,
                       ),
                     );
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
                   }
-                  return Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
-                    child: ImageCardsScroll(
-                      plantName: myGarden[index].name,
-                      plantImage: myGarden[index].imageSrc,
-                      onTap: () => navigateToNewScreen(
-                        context,
-                        PlantPage(
-                          plant: myGarden[index],
-                        ),
+                  return Expanded(
+                    child: GridView.builder(
+                      padding: EdgeInsets.only(bottom: screenHeight * 0.02),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.8,
+                        mainAxisSpacing: screenHeight * 0.01,
                       ),
+                      itemCount: myGarden.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index == myGarden.length) {
+                          return Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: screenWidth * 0.02),
+                            child: NewImageCard(
+                              height: double.infinity,
+                              width: double.infinity,
+                              iconSize: screenHeight * 0.075,
+                              onTap: () => {},
+                            ),
+                          );
+                        }
+                        return Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.02),
+                          child: ImageCardsScroll(
+                            plantName: myGarden[index].plantName,
+                            plantImage: myGarden[index].imageSrc,
+                            onlineImage: true,
+                            onTap: () => navigateToNewScreen(
+                              context,
+                              PlantPage(
+                                plant: myGarden[index],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   );
-                },
-              ),
-            ),
+                }),
           ],
         ),
       ),

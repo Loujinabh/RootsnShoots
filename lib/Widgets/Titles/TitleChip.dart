@@ -29,12 +29,17 @@ class TitleChip extends StatelessWidget {
           padding: EdgeInsets.only(left: screenWidth * 0.02),
           child: Row(
             children: [
-              Text(
-                content,
-                style: TextStyle(
-                  fontSize: fontSize,
-                  color: AppColors.contrast,
-                  fontWeight: FontWeight.bold,
+              SizedBox(
+                width: width * 0.85,
+                child: Text(
+                  content,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: fontSize,
+                    color: AppColors.contrast,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],

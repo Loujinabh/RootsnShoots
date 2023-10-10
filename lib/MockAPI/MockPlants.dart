@@ -1,4 +1,4 @@
-import 'package:plant_diary/Utils/PlantModel.dart';
+import 'package:plant_diary/API/DataModels/PlantModel.dart';
 
 class MockPlants {
   static List<PlantModel> myGarden = [

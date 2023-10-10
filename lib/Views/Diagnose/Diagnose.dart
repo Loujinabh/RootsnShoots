@@ -230,6 +230,7 @@ class Diagnose extends StatelessWidget {
                             child: ImageCardsScroll(
                               plantName: 'xx',
                               plantImage: "assets/images/background.jpg",
+                              onlineImage: false,
                               onTap: () => {},
                             ),
                           ),

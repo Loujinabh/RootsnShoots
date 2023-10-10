@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:plant_diary/API/DataModels/PlantModel.dart';
 import 'package:plant_diary/Config/Colors.dart';
 import 'package:plant_diary/MockAPI/MockPlants.dart';
 import 'package:plant_diary/MockAPI/MockTips.dart';
 import 'package:plant_diary/Utils/DateFormatter.dart';
 import 'package:plant_diary/API/GetWeather.dart';
-import 'package:plant_diary/Utils/PlantModel.dart';
 import 'package:plant_diary/Views/MyGarden/PlantPage.dart';
 import 'package:plant_diary/Views/Settings/Settings.dart';
 import 'package:plant_diary/Widgets/ImageCards/ImageCardsScroll.dart';
@@ -175,9 +175,10 @@ class Dashboard extends StatelessWidget {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
                                     return Center(
-                                        child: CircularProgressIndicator(
-                                      color: AppColors.contrast,
-                                    ));
+                                      child: CircularProgressIndicator(
+                                        color: AppColors.contrast,
+                                      ),
+                                    );
                                   } else if (snapshot.hasError) {
                                     return Text('Error: ${snapshot.error}');
                                   } else {
@@ -228,23 +229,23 @@ class Dashboard extends StatelessWidget {
                               scrollDirection: Axis.horizontal,
                               child: Row(
                                 children: [
-                                  ...List.generate(
-                                    myGarden.length,
-                                    (index) => Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: screenWidth * 0.01),
-                                      child: ImageCardsScroll(
-                                        plantName: myGarden[index].name,
-                                        plantImage: myGarden[index].imageSrc,
-                                        onTap: () => navigateToNewScreen(
-                                          context,
-                                          PlantPage(
-                                            plant: myGarden[index],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                                  // ...List.generate(
+                                  //   myGarden.length,
+                                  //   (index) => Padding(
+                                  //     padding: EdgeInsets.symmetric(
+                                  //         horizontal: screenWidth * 0.01),
+                                  //     child: ImageCardsScroll(
+                                  //       plantName: myGarden[index].name,
+                                  //       plantImage: myGarden[index].imageSrc,
+                                  //       onTap: () => navigateToNewScreen(
+                                  //         context,
+                                  //         PlantPage(
+                                  //           plant: myGarden[index],
+                                  //         ),
+                                  //       ),
+                                  //     ),
+                                  //   ),
+                                  // ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 4),
@@ -360,6 +361,7 @@ class Dashboard extends StatelessWidget {
                                       plantName: trendingInJordan[index].name,
                                       plantImage:
                                           trendingInJordan[index].imageSrc,
+                                      onlineImage: false,
                                       onTap: () => {},
                                     ),
                                   );
