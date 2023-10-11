@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:plant_diary/API/DataModels/PlantDetailsModel.dart';
 import 'package:plant_diary/API/DataModels/PlantModel.dart';
+import 'package:plant_diary/API/PlantDiaryApi.dart';
 import 'package:plant_diary/Config/Colors.dart';
 import 'package:plant_diary/MockAPI/MockPlants.dart';
 import 'package:plant_diary/MockAPI/MockTips.dart';
@@ -25,7 +27,14 @@ class Dashboard extends StatelessWidget {
   final String location = "Amman, Jordan";
 
   final List<String> tips = MockTips.tips;
-  final List<PlantModel> myGarden = MockPlants.myGarden;
+  List<PlantDetailsModel> myGarden = [];
+
+  Future<List<PlantDetailsModel>> getList() async {
+    var plants = await PlantDiaryApi.getPlantsByUserId(count: 5);
+    myGarden = plants;
+    return plants;
+  }
+
   final List<PlantModel> trendingInJordan = MockPlants.trendingInJordan;
 
   //
@@ -227,36 +236,53 @@ class Dashboard extends StatelessWidget {
                             padding: EdgeInsets.only(top: marginY * 2),
                             child: SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: [
-                                  // ...List.generate(
-                                  //   myGarden.length,
-                                  //   (index) => Padding(
-                                  //     padding: EdgeInsets.symmetric(
-                                  //         horizontal: screenWidth * 0.01),
-                                  //     child: ImageCardsScroll(
-                                  //       plantName: myGarden[index].name,
-                                  //       plantImage: myGarden[index].imageSrc,
-                                  //       onTap: () => navigateToNewScreen(
-                                  //         context,
-                                  //         PlantPage(
-                                  //           plant: myGarden[index],
-                                  //         ),
-                                  //       ),
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 4),
-                                    child: NewImageCard(
-                                      height: screenHeight * 0.1846,
-                                      width: screenWidth * 0.3364,
-                                      onTap: () => {},
-                                    ),
-                                  )
-                                ],
-                              ),
+                              child: FutureBuilder<List<PlantDetailsModel>>(
+                                  future: getList(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          color: AppColors.contrast,
+                                        ),
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      return Text('Error: ${snapshot.error}');
+                                    }
+                                    return Row(
+                                      children: [
+                                        ...List.generate(
+                                          myGarden.length,
+                                          (index) => Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: screenWidth * 0.01),
+                                            child: ImageCardsScroll(
+                                              plantName:
+                                                  myGarden[index].plantName,
+                                              plantImage:
+                                                  myGarden[index].imageSrc,
+                                              onlineImage: true,
+                                              onTap: () => navigateToNewScreen(
+                                                context,
+                                                PlantPage(
+                                                  plant: myGarden[index],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 4),
+                                          child: NewImageCard(
+                                            height: screenHeight * 0.1846,
+                                            width: screenWidth * 0.3364,
+                                            onTap: () => {},
+                                          ),
+                                        )
+                                      ],
+                                    );
+                                  }),
                             ),
                           )
                         ],

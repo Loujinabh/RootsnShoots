@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:plant_diary/Config/Colors.dart';
+import 'package:plant_diary/Widgets/Interactive/SearchBarWidget.dart';
 
 class NewImageCard extends StatelessWidget {
   final double height;
@@ -76,6 +77,12 @@ class NewImageCard extends StatelessWidget {
                   ],
                 )),
               ),
+            ),
+            SearchBarWidget(
+              height: height,
+              width: width,
+              borderRadius: 10,
+              hide: true,
             ),
           ],
         ),

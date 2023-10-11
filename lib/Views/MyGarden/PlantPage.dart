@@ -1,19 +1,117 @@
 import 'package:flutter/material.dart';
 import 'package:plant_diary/API/DataModels/PlantDetailsModel.dart';
+import 'package:plant_diary/API/DataModels/PlantModel.dart';
+import 'package:plant_diary/API/PlantDiaryApi.dart';
 import 'package:plant_diary/Config/Colors.dart';
 import 'package:plant_diary/Utils/DateFormatter.dart';
+import 'package:plant_diary/Utils/ShowSnackbar.dart';
 import 'package:plant_diary/Widgets/ImageCards/ImageDisplay.dart';
+import 'package:plant_diary/Widgets/PageHelpers/GetDifficulty.dart';
 import 'package:plant_diary/Widgets/PageHelpers/ProgressBar.dart';
 import 'package:plant_diary/Widgets/Titles/BoxTitle.dart';
 import 'package:plant_diary/Widgets/Titles/TitleChip.dart';
 
-class PlantPage extends StatelessWidget {
+class PlantPage extends StatefulWidget {
   final PlantDetailsModel plant;
 
-  const PlantPage({
-    super.key,
+  PlantPage({
+    Key? key,
     required this.plant,
-  });
+  }) : super(key: key);
+
+  @override
+  _PlantPageState createState() => _PlantPageState();
+}
+
+class _PlantPageState extends State<PlantPage> {
+  late final PlantDetailsModel plant;
+  late List<HistoryRecord> history;
+  @override
+  void initState() {
+    super.initState();
+    plant = widget.plant;
+    history = plant.history!;
+  }
+
+  Future<void> addHistoryRecord() async {
+    TextEditingController textFieldController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.contrast,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  "Add History Record",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.main,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: textFieldController,
+                  decoration: InputDecoration(
+                    hintText: "Enter your record",
+                    hintStyle: TextStyle(
+                      color: AppColors.main,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () async {
+                    String historyRecord = textFieldController.text;
+                    if (historyRecord.isNotEmpty) {
+                      var record = HistoryRecord(
+                        content: historyRecord,
+                        creationDate: DateTime.now(),
+                      );
+                      var statusCode = await PlantDiaryApi.appendToHistory(
+                          plant.uid!, record);
+                      if (statusCode == 200) {
+                        showSnackBar("History record added");
+                        setState(() {
+                          history.add(record);
+                        });
+                      } else {
+                        showSnackBar("Failed to add history record ");
+                      }
+
+                      Navigator.of(context).pop();
+                    } else {
+                      showSnackBar("Enter record content");
+                    }
+                  },
+                  style:
+                      ElevatedButton.styleFrom(backgroundColor: AppColors.main),
+                  child: Text(
+                    "Add",
+                    style: TextStyle(
+                      color: AppColors.contrast,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,12 +122,15 @@ class PlantPage extends StatelessWidget {
     double marginY = MediaQuery.of(context).size.height * 0.035;
 
     double historyBoxHeight = screenHeight * 0.25;
-    if (plant.history != null && plant.history!.isNotEmpty) {
-      historyBoxHeight = plant.history!.length * 0.2;
+    if (history.isNotEmpty) {
+      historyBoxHeight = history.length * screenHeight * 0.1;
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Container(
+        height: screenHeight,
+        width: screenWidth,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -212,7 +313,9 @@ class PlantPage extends StatelessWidget {
                             child: Container(
                               width: double.infinity,
                               decoration: BoxDecoration(
-                                color: AppColors.gradientStart,
+                                color: index % 2 == 0
+                                    ? AppColors.gradientStart.withOpacity(0.35)
+                                    : AppColors.secoundry.withOpacity(0.35),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Padding(
@@ -254,7 +357,7 @@ class PlantPage extends StatelessWidget {
                         Container(
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: AppColors.gradientStart,
+                            color: AppColors.gradientStart.withOpacity(0.35),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Padding(
@@ -273,6 +376,135 @@ class PlantPage extends StatelessWidget {
                           ),
                         ),
                       Padding(
+                        padding: EdgeInsets.only(top: marginY),
+                        child: BoxTitle(
+                          icon: Icons.local_florist,
+                          title: "Key Facts",
+                          color: AppColors.main,
+                        ),
+                      ),
+                      // Key Facts
+                      ...List.generate(
+                        plant.keyFacts.length,
+                        (index) {
+                          Color color = index % 2 == 0
+                              ? AppColors.secoundry.withOpacity(0.35)
+                              : AppColors.gradientStart.withOpacity(0.35);
+                          return Padding(
+                            padding: EdgeInsets.only(top: marginY * 0.25),
+                            child: Container(
+                              height: screenHeight * 0.05,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: color,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth * 0.02),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      plant.keyFacts[index].section,
+                                      style: TextStyle(
+                                        color: AppColors.main,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      plant.keyFacts[index].value,
+                                      style: TextStyle(
+                                        color: AppColors.main,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      // Difficulty
+                      Padding(
+                        padding: EdgeInsets.only(top: marginY),
+                        child: BoxTitle(
+                          icon: Icons.local_florist,
+                          title: "Difficulty",
+                          color: AppColors.main,
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: getDifficulty(plant.difficulty),
+                      ),
+                      // Difficulty
+                      Padding(
+                        padding: EdgeInsets.only(top: marginY),
+                        child: BoxTitle(
+                          icon: Icons.local_florist,
+                          title: "Characteristics",
+                          color: AppColors.main,
+                        ),
+                      ),
+                      ...List.generate(
+                        plant.plantCharacteristics.length,
+                        (index) {
+                          Color color = index % 2 == 0
+                              ? AppColors.secoundry.withOpacity(0.35)
+                              : AppColors.gradientStart.withOpacity(0.35);
+                          return Padding(
+                            padding: EdgeInsets.only(top: marginY * 0.25),
+                            child: Container(
+                              height: screenHeight * 0.045,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: color,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth * 0.02),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      plant.plantCharacteristics[index].section,
+                                      style: TextStyle(
+                                        color: AppColors.main,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: screenWidth * 0.5,
+                                      child: Text(
+                                        plant.plantCharacteristics[index].value
+                                                .join(", ")
+                                                .isEmpty
+                                            ? "Unknown"
+                                            : plant.plantCharacteristics[index]
+                                                .value
+                                                .join(", "),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.right,
+                                        style: TextStyle(
+                                          color: AppColors.main,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      Padding(
                         padding: EdgeInsets.only(top: marginY * 0.5),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -284,7 +516,7 @@ class PlantPage extends StatelessWidget {
                               color: AppColors.main,
                             ),
                             IconButton(
-                                onPressed: () => {},
+                                onPressed: () => addHistoryRecord(),
                                 icon: Icon(
                                   Icons.add,
                                   color: AppColors.main,
@@ -303,7 +535,7 @@ class PlantPage extends StatelessWidget {
                         height: historyBoxHeight,
                         width: screenWidth,
                         decoration: BoxDecoration(
-                          color: AppColors.gradientStart,
+                          color: AppColors.gradientStart.withOpacity(0.35),
                           borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(20),
                           ),
@@ -313,9 +545,9 @@ class PlantPage extends StatelessWidget {
                               vertical: marginY * 0.5,
                               horizontal: marginX * 0.75),
                           child: Column(
-                            children: plant.history != null
+                            children: history.isNotEmpty
                                 ? List.generate(
-                                    plant.history!.length,
+                                    history.length,
                                     (index) => Padding(
                                       padding: EdgeInsets.only(
                                           bottom: marginY * 0.5),
@@ -328,7 +560,7 @@ class PlantPage extends StatelessWidget {
                                           SizedBox(
                                             width: screenWidth * 0.4,
                                             child: Text(
-                                              plant.history![index].content,
+                                              history[index].content,
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 color: AppColors.gray,
@@ -336,8 +568,8 @@ class PlantPage extends StatelessWidget {
                                             ),
                                           ),
                                           Text(
-                                            formatDate(plant
-                                                .history![index].creationDate),
+                                            formatDate(
+                                                history[index].creationDate),
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               color: AppColors.gray,

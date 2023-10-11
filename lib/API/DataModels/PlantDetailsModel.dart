@@ -14,6 +14,7 @@ class PlantCharacteristic {
 
 class PlantDetailsModel {
   PlantDetailsModel({
+    this.uid,
     required this.plantName,
     required this.plantScientificName,
     required this.plantOtherNames,
@@ -28,6 +29,7 @@ class PlantDetailsModel {
     required this.imageSrc,
   });
 
+  String? uid;
   String plantName;
   String plantScientificName;
   List<String> plantOtherNames;

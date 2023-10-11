@@ -7,7 +7,17 @@ import 'package:plant_diary/Utils/Navigation.dart';
 import 'package:plant_diary/Views/MyGarden/PlantCreation.dart';
 
 class SearchBarWidget extends StatefulWidget {
-  const SearchBarWidget({super.key});
+  final double? height;
+  final double? width;
+  final double? borderRadius;
+  final bool? hide;
+  const SearchBarWidget({
+    super.key,
+    this.height,
+    this.width,
+    this.borderRadius,
+    this.hide,
+  });
 
   @override
   State<SearchBarWidget> createState() => _SearchBarWidgetState();
@@ -29,13 +39,13 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
     double screenWidth = MediaQuery.of(context).size.width;
 
     return SizedBox(
-      height: screenHeight * 0.045,
-      width: screenWidth * 0.8,
+      height: widget.height ?? screenHeight * 0.045,
+      width: widget.width ?? screenWidth * 0.8,
       child: SearchAnchor(
         builder: (BuildContext context, SearchController controller) {
           return Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(25),
+              borderRadius: BorderRadius.circular(widget.borderRadius ?? 25),
               border: Border.all(
                 color: AppColors.main,
                 width: 1.0,
@@ -43,11 +53,17 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             ),
             child: Center(
               child: SearchBar(
+                overlayColor: widget.hide == null
+                    ? null
+                    : const MaterialStatePropertyAll<Color>(Colors.transparent),
                 controller: controller,
-                shadowColor:
-                    const MaterialStatePropertyAll<Color>(Colors.transparent),
-                backgroundColor: MaterialStatePropertyAll<Color>(
-                    AppColors.main.withAlpha(38)),
+                shadowColor: widget.hide == null
+                    ? const MaterialStatePropertyAll<Color>(Colors.transparent)
+                    : const MaterialStatePropertyAll<Color>(Colors.transparent),
+                backgroundColor: widget.hide == null
+                    ? MaterialStatePropertyAll<Color>(
+                        AppColors.main.withAlpha(38))
+                    : const MaterialStatePropertyAll<Color>(Colors.transparent),
                 padding: const MaterialStatePropertyAll<EdgeInsets>(
                     EdgeInsets.symmetric(horizontal: 16.0)),
                 onTap: () => controller.openView(),
@@ -59,24 +75,23 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                     },
                   );
                 },
-                leading: Icon(
-                  Icons.search,
-                  color: AppColors.gray,
-                ),
-                textStyle: const MaterialStatePropertyAll<TextStyle>(
-                    TextStyle(color: Colors.black87)),
-                hintText: "new plant ?",
-                hintStyle: MaterialStatePropertyAll<TextStyle>(
-                    TextStyle(color: AppColors.main)),
-                trailing: <Widget>[
-                  IconButton(
-                    icon: Icon(
-                      Icons.camera_alt,
-                      color: AppColors.gray,
-                    ),
-                    onPressed: () => {},
-                  )
-                ],
+                leading: widget.hide == null
+                    ? Icon(
+                        Icons.search,
+                        color: AppColors.gray,
+                      )
+                    : null,
+                textStyle: widget.hide == null
+                    ? const MaterialStatePropertyAll<TextStyle>(
+                        TextStyle(color: Colors.black87))
+                    : const MaterialStatePropertyAll<TextStyle>(
+                        TextStyle(color: Colors.transparent)),
+                hintText: widget.hide == null ? "New plant?" : null,
+                hintStyle: widget.hide == null
+                    ? MaterialStatePropertyAll<TextStyle>(
+                        TextStyle(color: AppColors.main))
+                    : const MaterialStatePropertyAll<TextStyle>(
+                        TextStyle(color: Colors.transparent)),
               ),
             ),
           );
@@ -85,7 +100,11 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             (BuildContext context, SearchController controller) {
           if (controller.text != searchQuery) {
             searchQuery = controller.text;
-            updateList();
+            _debounced.run(
+              () async {
+                await updateList();
+              },
+            );
           }
           return [
             FutureBuilder<List<SearchPlantModel>>(

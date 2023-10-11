@@ -55,7 +55,7 @@ class PlantDiaryApi {
         .catchError((error) => print("Failed to add Plant: $error"));
   }
 
-  static Future<List<PlantDetailsModel>> getPlantsByUserId() async {
+  static Future<List<PlantDetailsModel>> getPlantsByUserId({int? count}) async {
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
@@ -70,8 +70,22 @@ class PlantDiaryApi {
           (doc) {
             var data = doc.data() as Map<String, dynamic>;
             var cateTips = data["tips"] as List;
+            var facts = data['keyFacts'] as List;
+            var characteristicsMap = data['plantCharacteristics'] as List;
+            var characteristics = <PlantCharacteristic>[];
+            if (characteristicsMap.isNotEmpty) {
+              characteristics = characteristicsMap.map((e) {
+                var valueRaw = e['value'] as List;
+                var value = valueRaw.map((e) => e.toString()).toList();
+                var section = e['section'];
+                return PlantCharacteristic(section: section, value: value);
+              }).toList();
+            }
+
+            var history = data['history'] as List;
 
             return PlantDetailsModel(
+              uid: doc.id,
               plantName: data["name"],
               plantScientificName: data["scientificName"],
               plantOtherNames: [],
@@ -81,14 +95,33 @@ class PlantDiaryApi {
                       (e) => CareTips(title: e["title"], content: e["content"]))
                   .toList(),
               creationDate: data["creationDate"].toDate(),
-              keyFacts: [],
-              plantCharacteristics: [],
+              keyFacts: facts
+                  .map(
+                    (e) => PlantFact(
+                      section: e["section"],
+                      value: e["value"],
+                    ),
+                  )
+                  .toList(),
+              plantCharacteristics: characteristics,
               floweringSeason: "",
               difficulty: data["difficulty"],
               imageSrc: data["imageRef"],
+              history: history
+                  .map(
+                    (e) => HistoryRecord(
+                      content: e['content'],
+                      creationDate: e['creationDate'].toDate(),
+                    ),
+                  )
+                  .toList(),
             );
           },
         ).toList();
+
+        if (count != null) {
+          return plants.take(count).toList();
+        }
 
         return plants;
       } catch (e) {
@@ -98,6 +131,29 @@ class PlantDiaryApi {
     } else {
       print('No user is currently authenticated.');
       return [];
+    }
+  }
+
+  static Future<int> appendToHistory(
+    String documentID,
+    HistoryRecord historyRecord,
+  ) async {
+    try {
+      final DocumentReference docRef =
+          FirebaseFirestore.instance.collection('PlantDiary').doc(documentID);
+
+      Map<String, dynamic> data = {
+        "content": historyRecord.content,
+        "creationDate": historyRecord.creationDate
+      };
+
+      await docRef.update({
+        'history': FieldValue.arrayUnion([data])
+      });
+      return 200;
+    } catch (e) {
+      print("Error adding element to the history: $e");
+      return 400;
     }
   }
 }

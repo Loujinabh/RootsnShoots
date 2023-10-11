@@ -5,6 +5,7 @@ import 'package:plant_diary/API/PlantDiaryApi.dart';
 import 'package:plant_diary/Config/Colors.dart';
 import 'package:plant_diary/Layouts/LayoutPage.dart';
 import 'package:plant_diary/Utils/Navigation.dart';
+import 'package:plant_diary/Widgets/PageHelpers/GetDifficulty.dart';
 import 'package:plant_diary/Widgets/Titles/BoxTitle.dart';
 
 class PlantCreation extends StatefulWidget {
@@ -383,36 +384,4 @@ class _PlantCreationState extends State<PlantCreation> {
       ),
     );
   }
-}
-
-Widget getDifficulty(String value) {
-  Color color = AppColors.main;
-  IconData icon = Icons.signal_cellular_alt_1_bar;
-
-  if (value == "Moderate") {
-    color = AppColors.thridry;
-    icon = Icons.signal_cellular_alt_2_bar;
-  }
-  if (value == "High") {
-    color = AppColors.gradientEnd;
-    icon = Icons.signal_cellular_4_bar;
-  }
-
-  return Column(
-    children: [
-      Icon(
-        icon,
-        size: 24,
-        color: color,
-      ),
-      Text(
-        value,
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: color,
-          fontSize: 24,
-        ),
-      )
-    ],
-  );
 }
