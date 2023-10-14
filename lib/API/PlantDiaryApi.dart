@@ -156,4 +156,20 @@ class PlantDiaryApi {
       return 400;
     }
   }
+
+  static Future<int> editName(
+    String documentID,
+    String name,
+  ) async {
+    try {
+      final DocumentReference docRef =
+          FirebaseFirestore.instance.collection('PlantDiary').doc(documentID);
+
+      await docRef.update({'name': name});
+      return 200;
+    } catch (e) {
+      print("Error editing name: $e");
+      return 400;
+    }
+  }
 }

@@ -15,7 +15,6 @@ import 'package:plant_diary/Widgets/ImageCards/NewImageCard.dart';
 import 'package:plant_diary/Widgets/Interactive/SearchBarWidget.dart';
 import 'package:plant_diary/Widgets/Titles/BoxTitle.dart';
 import 'package:plant_diary/Widgets/PageHelpers/ShowTips.dart';
-
 import '../../Utils/Navigation.dart';
 
 class Dashboard extends StatelessWidget {
@@ -336,67 +335,9 @@ class Dashboard extends StatelessWidget {
                             ],
                           )),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 21),
-                      child: Container(
-                        height: screenHeight * 0.25,
-                        width: screenWidth * 0.9253,
-                        padding: const EdgeInsets.only(top: 20),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: AppColors.secoundry,
-                        ),
-                        child: Column(
-                          children: [
-                            const Row(
-                              children: [
-                                BoxTitle(
-                                  icon: Icons.spa,
-                                  title: "Trending in Jordan",
-                                  secondIcon: Icons.navigate_next,
-                                ),
-                              ],
-                            ),
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: List.generate(trendingInJordan.length,
-                                    (index) {
-                                  EdgeInsetsGeometry padding;
-                                  if (index == 0) {
-                                    padding = EdgeInsets.only(
-                                      left: screenWidth * 0.075,
-                                      right: screenWidth * 0.01,
-                                    );
-                                  } else if (index ==
-                                      trendingInJordan.length - 1) {
-                                    padding = EdgeInsets.only(
-                                      left: screenWidth * 0.01,
-                                      right: screenWidth * 0.075,
-                                    );
-                                  } else {
-                                    padding = EdgeInsets.symmetric(
-                                      horizontal: screenWidth * 0.01,
-                                    );
-                                  }
-                                  return Padding(
-                                    padding: padding,
-                                    child: ImageCardsScroll(
-                                      height: screenHeight * 0.15,
-                                      width: screenWidth * 0.275,
-                                      plantName: trendingInJordan[index].name,
-                                      plantImage:
-                                          trendingInJordan[index].imageSrc,
-                                      onlineImage: false,
-                                      onTap: () => {},
-                                    ),
-                                  );
-                                }),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
+                    const Padding(
+                      padding: EdgeInsets.all(25),
+                      child: Text("your own beautiful plant chapter ❀ ⊹°"),
                     ),
                   ],
                 ),

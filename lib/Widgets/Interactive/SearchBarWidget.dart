@@ -25,11 +25,17 @@ class SearchBarWidget extends StatefulWidget {
 
 class _SearchBarWidgetState extends State<SearchBarWidget> {
   final Debounced _debounced = Debounced(250);
-  List<SearchPlantModel> searchList = [];
+  late Future<List<SearchPlantModel>> searchList;
   String searchQuery = "";
 
+  @override
+  void initState() {
+    super.initState();
+    updateList();
+  }
+
   Future<List<SearchPlantModel>> updateList() async {
-    searchList = await searchPlant(searchQuery);
+    searchList = searchPlant(searchQuery);
     return searchList;
   }
 
@@ -108,21 +114,22 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
           }
           return [
             FutureBuilder<List<SearchPlantModel>>(
-              future: updateList(),
+              future: searchList,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   if (snapshot.hasData) {
+                    var list = snapshot.data;
                     return ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemExtent: screenHeight * 0.12,
-                      itemCount: searchList.length,
+                      itemCount: list!.length,
                       itemBuilder: (BuildContext context, int index) {
-                        final int plantId = searchList[index].id;
-                        final String name = searchList[index].common_name;
+                        final int plantId = list[index].id;
+                        final String name = list[index].common_name;
                         final String scientificName =
-                            searchList[index].scientific_name;
-                        final String imageSrc = searchList[index].default_image;
+                            list[index].scientific_name;
+                        final String imageSrc = list[index].default_image;
 
                         return Padding(
                           padding: EdgeInsets.symmetric(

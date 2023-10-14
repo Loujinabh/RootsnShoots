@@ -26,11 +26,89 @@ class PlantPage extends StatefulWidget {
 class _PlantPageState extends State<PlantPage> {
   late final PlantDetailsModel plant;
   late List<HistoryRecord> history;
+  late String plantName;
   @override
   void initState() {
     super.initState();
     plant = widget.plant;
     history = plant.history!;
+    plantName = plant.plantName;
+  }
+
+  Future<void> editName() async {
+    TextEditingController textFieldController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.contrast,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  "Edit Plant Nickname",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.main,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: textFieldController,
+                  decoration: InputDecoration(
+                    hintText: "Enter new name",
+                    hintStyle: TextStyle(
+                      color: AppColors.main,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () async {
+                    String name = textFieldController.text;
+                    if (name.isNotEmpty) {
+                      var statusCode =
+                          await PlantDiaryApi.editName(plant.uid!, name);
+                      if (statusCode == 200) {
+                        showSnackBar("Name updated");
+                        setState(() {
+                          plantName = name;
+                        });
+                      } else {
+                        showSnackBar("Failed to update name");
+                      }
+
+                      Navigator.of(context).pop();
+                    } else {
+                      showSnackBar("Enter record content");
+                    }
+                  },
+                  style:
+                      ElevatedButton.styleFrom(backgroundColor: AppColors.main),
+                  child: Text(
+                    "Edit",
+                    style: TextStyle(
+                      color: AppColors.contrast,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Future<void> addHistoryRecord() async {
@@ -182,7 +260,7 @@ class _PlantPageState extends State<PlantPage> {
                                         SizedBox(
                                           width: screenWidth * 0.8,
                                           child: Text(
-                                            "${plant.plantName}'s Diary",
+                                            "$plantName's Diary",
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
@@ -239,10 +317,11 @@ class _PlantPageState extends State<PlantPage> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   TitleChip(
-                                    content: plant.plantName,
+                                    content: plantName,
                                     height: screenHeight * 0.04,
                                     width: screenWidth * 0.3,
                                     fontSize: 20,
+                                    onTap: editName,
                                   ),
                                   SizedBox(
                                     width: screenWidth * 0.02,
@@ -271,6 +350,7 @@ class _PlantPageState extends State<PlantPage> {
                                 height: screenHeight * 0.06,
                                 width: screenWidth * 0.47,
                                 progress: plant.getProgress(),
+                                color: AppColors.main.withOpacity(0.35),
                               )
                             ],
                           ),
@@ -413,11 +493,17 @@ class _PlantPageState extends State<PlantPage> {
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    Text(
-                                      plant.keyFacts[index].value,
-                                      style: TextStyle(
-                                        color: AppColors.main,
-                                        fontWeight: FontWeight.bold,
+                                    SizedBox(
+                                      width: screenWidth * 0.4,
+                                      child: Text(
+                                        plant.keyFacts[index].value,
+                                        textAlign: TextAlign.right,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: AppColors.main,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ],

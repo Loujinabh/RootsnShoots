@@ -5,12 +5,16 @@ class ProgressBar extends StatelessWidget {
   final double height;
   final double width;
   final double progress;
+  final Color? color;
+  final double? borderRadius;
 
   const ProgressBar({
     super.key,
     required this.height,
     required this.width,
     required this.progress,
+    this.color,
+    this.borderRadius,
   });
 
   @override
@@ -19,14 +23,14 @@ class ProgressBar extends StatelessWidget {
       height: height,
       width: width,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: AppColors.secoundry,
+        borderRadius: BorderRadius.circular(borderRadius ?? 20),
+        color: color ?? AppColors.secoundry,
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(
             vertical: height * 0.05, horizontal: width * 0.015),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(borderRadius ?? 20),
           child: Stack(
             children: [
               Align(
@@ -35,7 +39,7 @@ class ProgressBar extends StatelessWidget {
                   height: height,
                   width: width * progress,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(borderRadius ?? 20),
                     gradient: LinearGradient(
                       colors: [AppColors.gradientStart, AppColors.gradientEnd],
                       begin: Alignment.centerLeft,

@@ -1,18 +1,96 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:plant_diary/API/DataModels/SearchPlantModel.dart';
+import 'package:plant_diary/API/PlantIdApi.dart';
+import 'package:plant_diary/API/PlantSearchApi.dart';
 import 'package:plant_diary/Config/Colors.dart';
+import 'package:plant_diary/Utils/Navigation.dart';
+import 'package:plant_diary/Views/MyGarden/PlantCreation.dart';
+import 'package:plant_diary/Views/Settings/Settings.dart';
+import 'package:plant_diary/Widgets/ImageCards/ImageCardsScroll.dart';
+import 'package:plant_diary/Widgets/PageHelpers/ProgressBar.dart';
+import 'dart:convert';
 
-import '../../Utils/Navigation.dart';
-import '../../Widgets/Titles/BoxTitle.dart';
-import '../../Widgets/ImageCards/ImageCardsScroll.dart';
-import '../Settings/Settings.dart';
+import 'package:plant_diary/Widgets/Titles/BoxTitle.dart';
 
-class Diagnose extends StatelessWidget {
+class Diagnose extends StatefulWidget {
   const Diagnose({
     super.key,
   });
 
+  @override
+  State<Diagnose> createState() => _DiagnoseState();
+}
+
+class _DiagnoseState extends State<Diagnose> {
   final String name = "Loujin AbuHejleh";
+
+  String base64Image = "";
+  bool showPlus = false;
+  bool identityFlag = false;
+  bool isLoading = false;
+  int plantId = 0;
+  late Future<PlantIdentity> plantIdentity;
+  late Future<PlantHealth> plantHealth;
+
+  @override
+  void initState() {
+    super.initState();
+    plantIdentity = Future(() => PlantIdentity(name: "", images: []));
+    plantHealth = Future(() => PlantHealth(diseases: [], health: -1.0));
+  }
+
+  Future<void> identify() async {
+    final image = await ImagePicker().pickImage(source: ImageSource.camera);
+
+    setState(() {
+      isLoading = true;
+    });
+
+    if (image == null) {
+      return;
+    }
+
+    final bytes = await image.readAsBytes();
+    final String imageBase64 = "data:image/jpg;base64,${base64Encode(bytes)}";
+
+    identityFlag = true;
+    plantIdentity = PlantIdApi.identifyPlant(imageBase64);
+    var plant = await plantIdentity;
+    List<SearchPlantModel> listPlants = await searchPlant(plant.name);
+    if (listPlants.isNotEmpty) {
+      plantId = listPlants.first.id;
+      showPlus = plantId < 3000;
+    }
+
+    setState(() {
+      base64Image = base64Encode(bytes);
+      isLoading = false;
+    });
+  }
+
+  Future<void> diagnose() async {
+    final image = await ImagePicker().pickImage(source: ImageSource.camera);
+
+    setState(() {
+      isLoading = true;
+    });
+
+    if (image == null) {
+      return;
+    }
+
+    final bytes = await image.readAsBytes();
+    final String imageBase64 = "data:image/jpg;base64,${base64Encode(bytes)}";
+
+    identityFlag = false;
+    plantHealth = PlantIdApi.diagnosePlant(imageBase64);
+    setState(() {
+      base64Image = base64Encode(bytes);
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,117 +211,424 @@ class Diagnose extends StatelessWidget {
                 ),
               ),
             ),
-
-            SizedBox(
-              height: screenHeight * 0.40,
+            Container(
+              margin: const EdgeInsets.all(16),
+              height: screenHeight * 0.35,
               width: screenWidth,
-              child: Stack(
-                children: [
-                  Container(
-                    margin: EdgeInsets.all(16),
-                    height: screenHeight * 0.35,
-                    width: screenWidth,
-                    decoration: BoxDecoration(
-                      color: Colors.white60,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Container(
-                      margin: EdgeInsets.only(bottom: 40),
-                      width: screenWidth * 0.5,
-                      height: screenHeight * 0.05,
-                      child: ElevatedButton(
-                        onPressed: () => {},
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white60,
-                          backgroundColor:
-                              AppColors.secoundry.withOpacity(0.70),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.only(right: 5),
-                              child: Icon(Icons.medication),
-                            ),
-                            Text(
-                              "Auto Diagnose",
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: screenHeight * 0.0215,
+              decoration: BoxDecoration(
+                color: AppColors.contrast,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: base64Image.isEmpty
+                  ? Center(
+                      child: !isLoading
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () => identify(),
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.white60,
+                                    backgroundColor:
+                                        AppColors.secoundry.withOpacity(0.70),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Padding(
+                                        padding: EdgeInsets.only(right: 5),
+                                        child: Icon(Icons.image_search),
+                                      ),
+                                      Text(
+                                        "Identify",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: screenHeight * 0.0215,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () => diagnose(),
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.white60,
+                                    backgroundColor:
+                                        AppColors.secoundry.withOpacity(0.70),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Padding(
+                                        padding: EdgeInsets.only(right: 5),
+                                        child: Icon(Icons.medication),
+                                      ),
+                                      Text(
+                                        "Diagnose",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: screenHeight * 0.019,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.main,
                               ),
                             ),
-                          ],
-                        ),
+                    )
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Stack(
+                        children: [
+                          SizedBox(
+                            height: double.infinity,
+                            width: double.infinity,
+                            child: Image.memory(
+                              base64Decode(base64Image),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: SizedBox(
+                              width: screenWidth * 0.32,
+                              child: ElevatedButton(
+                                onPressed: () => setState(() {
+                                  base64Image = "";
+                                }),
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white60,
+                                  backgroundColor:
+                                      AppColors.secoundry.withOpacity(0.70),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(25),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Padding(
+                                      padding: EdgeInsets.only(right: 5),
+                                      child: Icon(Icons.medication),
+                                    ),
+                                    Text(
+                                      "Retake",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: screenHeight * 0.0215,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ],
-              ),
             ),
-
-            Stack(
-              children: [
-                Align(
-                  alignment: Alignment.center,
-                  child: Container(
-                    height: screenHeight * 0.23,
-                    width: screenWidth * 0.9253,
-                    padding: const EdgeInsets.only(top: 20),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: AppColors.secoundry,
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            GestureDetector(
-                              child: const BoxTitle(
-                                icon: Icons.local_florist,
-                                title: "Explore by Plant",
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: marginY * 2),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        ...List.generate(
-                          4,
-                          (index) => Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: ImageCardsScroll(
-                              plantName: 'xx',
-                              plantImage: "assets/images/background.jpg",
-                              onlineImage: false,
-                              onTap: () => {},
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            ),
+            identityFlag ? identityWidget() : healthWidget(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget identityWidget() {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    double marginX = MediaQuery.of(context).size.width * 0.06;
+    return FutureBuilder<PlantIdentity>(
+      future: plantIdentity,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(
+              color: AppColors.contrast,
+            ),
+          );
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (!snapshot.hasData || snapshot.data!.name.isEmpty) {
+          return Expanded(
+            child: Center(
+              child: Text(
+                'No results yet',
+                style: TextStyle(
+                    color: AppColors.main,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16),
+              ),
+            ),
+          );
+        }
+        var plant = snapshot.data;
+
+        return Column(
+          children: [
+            Container(
+              height: screenHeight * 0.08,
+              width: screenWidth * 0.9253,
+              decoration: BoxDecoration(
+                color: AppColors.main.withOpacity(0.35),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: marginX),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      plant!.name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.main,
+                        fontSize: 16,
+                      ),
+                    ),
+                    if (showPlus)
+                      IconButton(
+                        onPressed: () {
+                          navigateToNewScreen(
+                            context,
+                            PlantCreation(
+                              plantId: plantId,
+                            ),
+                          );
+                        },
+                        icon: Icon(
+                          Icons.add,
+                          color: AppColors.main,
+                        ),
+                      )
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 21),
+              child: Container(
+                height: screenHeight * 0.25,
+                width: screenWidth * 0.9253,
+                padding: const EdgeInsets.only(top: 20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: AppColors.main.withOpacity(0.35),
+                ),
+                child: Column(
+                  children: [
+                    const Row(
+                      children: [
+                        BoxTitle(
+                          icon: Icons.spa,
+                          title: "Similar Images",
+                        ),
+                      ],
+                    ),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: List.generate(plant.images.length, (index) {
+                          EdgeInsetsGeometry padding;
+                          if (index == 0) {
+                            padding = EdgeInsets.only(
+                              left: screenWidth * 0.075,
+                              right: screenWidth * 0.01,
+                            );
+                          } else if (index == plant.images.length - 1) {
+                            padding = EdgeInsets.only(
+                              left: screenWidth * 0.01,
+                              right: screenWidth * 0.075,
+                            );
+                          } else {
+                            padding = EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.01,
+                            );
+                          }
+                          return Padding(
+                            padding: padding,
+                            child: ImageCardsScroll(
+                              height: screenHeight * 0.15,
+                              width: screenWidth * 0.275,
+                              plantImage: plant.images[index],
+                              onlineImage: true,
+                              onTap: () => {},
+                            ),
+                          );
+                        }),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget healthWidget() {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    double marginX = MediaQuery.of(context).size.width * 0.06;
+    double marginY = MediaQuery.of(context).size.height * 0.035;
+
+    return FutureBuilder<PlantHealth>(
+      future: plantHealth,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(
+              color: AppColors.contrast,
+            ),
+          );
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (!snapshot.hasData || snapshot.data!.health == -1.0) {
+          return Expanded(
+            child: Center(
+              child: Text(
+                'No results yet',
+                style: TextStyle(
+                    color: AppColors.main,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16),
+              ),
+            ),
+          );
+        } else if (snapshot.data!.diseases.isEmpty) {
+          return Expanded(
+            child: Center(
+              child: Text(
+                'Unknown condition',
+                style: TextStyle(
+                    color: AppColors.main,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16),
+              ),
+            ),
+          );
+        }
+        var plant = snapshot.data;
+        return Column(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "health bar",
+                  style: TextStyle(
+                      color: AppColors.main,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
+                ),
+                SizedBox(
+                  height: screenHeight * 0.01,
+                ),
+                ProgressBar(
+                  height: screenHeight * 0.05,
+                  width: screenWidth * 0.85,
+                  progress: plant!.health,
+                  color: AppColors.main.withOpacity(0.35),
+                  borderRadius: 15,
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 21),
+              child: Container(
+                height: screenHeight * 0.25,
+                width: screenWidth * 0.9253,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: AppColors.main.withOpacity(0.35),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: marginX * 0.5, vertical: marginY * 0.5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ImageCardsScroll(
+                        height: screenHeight * 0.30,
+                        width: screenWidth * 0.3,
+                        plantImage: plant.diseases[0].images[0],
+                        onlineImage: true,
+                        onTap: () => {},
+                      ),
+                      SizedBox(
+                        width: screenWidth * 0.5,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ...List.generate(
+                                plant.diseases.length,
+                                (index) {
+                                  String originalString =
+                                      "${plant.diseases[index].name}:";
+                                  String capitalizedString =
+                                      originalString[0].toUpperCase() +
+                                          originalString.substring(1);
+
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        capitalizedString,
+                                        style: TextStyle(
+                                            color: AppColors.main,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16),
+                                      ),
+                                      SizedBox(
+                                        height: marginY * 0.5,
+                                      ),
+                                      Text(plant
+                                          .diseases[index]
+                                          .treatment[plant.diseases[index]
+                                              .treatment.keys.first]!
+                                          .first),
+                                      SizedBox(
+                                        height: marginY,
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

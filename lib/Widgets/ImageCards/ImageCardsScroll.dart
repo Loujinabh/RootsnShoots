@@ -6,12 +6,12 @@ class ImageCardsScroll extends StatelessWidget {
   final double? width;
   final String plantImage;
   final bool onlineImage;
-  final String plantName;
+  final String? plantName;
   final Function() onTap;
 
   const ImageCardsScroll({
     required this.plantImage,
-    required this.plantName,
+    this.plantName,
     required this.onlineImage,
     super.key,
     this.height,
@@ -93,24 +93,25 @@ class ImageCardsScroll extends StatelessWidget {
                       ),
                     ),
                   ),
-                Positioned(
-                  left: 10, // Adjust the left position as needed
-                  bottom: 10, // Adjust the bottom position as needed
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      color: AppColors.gray.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Text(
-                      plantName,
-                      style: TextStyle(
-                        color: AppColors.contrast,
-                        fontSize: screenHeight * 0.02,
+                if (plantName != null)
+                  Positioned(
+                    left: 10, // Adjust the left position as needed
+                    bottom: 10, // Adjust the bottom position as needed
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: AppColors.gray.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Text(
+                        plantName!,
+                        style: TextStyle(
+                          color: AppColors.contrast,
+                          fontSize: screenHeight * 0.02,
+                        ),
                       ),
                     ),
                   ),
-                ),
               ],
             ),
           ),

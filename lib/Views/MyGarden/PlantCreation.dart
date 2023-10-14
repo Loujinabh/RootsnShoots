@@ -271,11 +271,17 @@ class _PlantCreationState extends State<PlantCreation> {
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
-                                            Text(
-                                              plant.keyFacts[index].value,
-                                              style: TextStyle(
-                                                color: AppColors.main,
-                                                fontWeight: FontWeight.bold,
+                                            SizedBox(
+                                              width: screenWidth * 0.4,
+                                              child: Text(
+                                                plant.keyFacts[index].value,
+                                                textAlign: TextAlign.right,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  color: AppColors.main,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
                                             ),
                                           ],
