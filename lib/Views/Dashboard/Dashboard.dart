@@ -49,9 +49,15 @@ class _DashboardState extends State<Dashboard> {
 
   void setName() async {
     var tempName = FirebaseAuth.instance.currentUser!.displayName;
-    setState(() {
-      name = tempName!;
-    });
+    setState(
+      () {
+        try {
+          name = tempName!;
+        } catch (e) {
+          name = "Not available";
+        }
+      },
+    );
   }
 
   Future<List<PlantDetailsModel>> getList() async {
@@ -241,7 +247,7 @@ class _DashboardState extends State<Dashboard> {
                                   Row(
                                     children: [
                                       GestureDetector(
-                                        onTap: () => widget.navigateCallback(1),
+                                        onTap: () => widget.navigateCallback(2),
                                         child: const BoxTitle(
                                           icon: Icons.local_florist,
                                           title: "My Garden",
