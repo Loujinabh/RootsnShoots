@@ -50,7 +50,7 @@ class _DiagnoseState extends State<Diagnose> {
   }
 
   Future<void> identify() async {
-    final image = await ImagePicker().pickImage(source: ImageSource.camera);
+    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
 
     setState(() {
       isLoading = true;
