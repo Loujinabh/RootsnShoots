@@ -65,17 +65,18 @@ class NewImageCard extends StatelessWidget {
                   ],
                 ),
                 child: Center(
-                    child: Icon(
-                  Icons.add,
-                  color: AppColors.contrast,
-                  size: iconSize ?? height * 0.25,
-                  shadows: [
-                    Shadow(
-                        color: Colors.black87.withOpacity(0.3),
-                        offset: const Offset(0, 3),
-                        blurRadius: 6)
-                  ],
-                )),
+                  child: Icon(
+                    Icons.add,
+                    color: AppColors.contrast,
+                    size: iconSize ?? height * 0.25,
+                    shadows: [
+                      Shadow(
+                          color: Colors.black87.withOpacity(0.3),
+                          offset: const Offset(0, 3),
+                          blurRadius: 6)
+                    ],
+                  ),
+                ),
               ),
             ),
             SearchBarWidget(

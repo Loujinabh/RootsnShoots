@@ -4,7 +4,16 @@ import 'package:plant_diary/Config/Colors.dart';
 import 'package:plant_diary/Config/Keys.dart';
 
 Future<int> signUpWithEmailAndPassword(
-    String email, String password, String name) async {
+    BuildContext context, String email, String password, String name) async {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => Center(
+      child: CircularProgressIndicator(
+        color: AppColors.main,
+      ),
+    ),
+  );
   try {
     await FirebaseAuth.instance.createUserWithEmailAndPassword(
       email: email,
@@ -16,9 +25,11 @@ Future<int> signUpWithEmailAndPassword(
       await user.updateDisplayName(name);
     }
 
+    Keys.navigatorKey.currentState!.popUntil((route) => route.isFirst);
     return 200;
   } catch (e) {
     print('Failed to sign up: $e');
+    Keys.navigatorKey.currentState!.popUntil((route) => route.isFirst);
     return 400;
   }
 }

@@ -1,5 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:plant_diary/API/DataModels/PlantDetailsModel.dart';
 import 'package:plant_diary/API/DataModels/PlantModel.dart';
 import 'package:plant_diary/API/PlantDiaryApi.dart';
@@ -8,6 +8,7 @@ import 'package:plant_diary/MockAPI/MockPlants.dart';
 import 'package:plant_diary/MockAPI/MockTips.dart';
 import 'package:plant_diary/Utils/DateFormatter.dart';
 import 'package:plant_diary/API/GetWeather.dart';
+import 'package:plant_diary/Utils/GetAddress.dart';
 import 'package:plant_diary/Views/MyGarden/PlantPage.dart';
 import 'package:plant_diary/Views/Settings/Settings.dart';
 import 'package:plant_diary/Widgets/ImageCards/ImageCardsScroll.dart';
@@ -17,16 +18,41 @@ import 'package:plant_diary/Widgets/Titles/BoxTitle.dart';
 import 'package:plant_diary/Widgets/PageHelpers/ShowTips.dart';
 import '../../Utils/Navigation.dart';
 
-class Dashboard extends StatelessWidget {
+class Dashboard extends StatefulWidget {
   final Function(int) navigateCallback;
   Dashboard({super.key, required this.navigateCallback});
 
-  // API vars
-  final String name = "Loujin AbuHejleh";
-  final String location = "Amman, Jordan";
+  @override
+  State<Dashboard> createState() => _DashboardState();
+}
 
+class _DashboardState extends State<Dashboard> {
+  // API vars
+  String name = "-----";
+  String location = "-- , --";
   final List<String> tips = MockTips.tips;
   List<PlantDetailsModel> myGarden = [];
+
+  @override
+  void initState() {
+    super.initState();
+    setLocation();
+    setName();
+  }
+
+  void setLocation() async {
+    var address = await getAddress();
+    setState(() {
+      location = address;
+    });
+  }
+
+  void setName() async {
+    var tempName = FirebaseAuth.instance.currentUser!.displayName;
+    setState(() {
+      name = tempName!;
+    });
+  }
 
   Future<List<PlantDetailsModel>> getList() async {
     var plants = await PlantDiaryApi.getPlantsByUserId(count: 5);
@@ -37,7 +63,6 @@ class Dashboard extends StatelessWidget {
   final List<PlantModel> trendingInJordan = MockPlants.trendingInJordan;
 
   //
-
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -84,7 +109,7 @@ class Dashboard extends StatelessWidget {
                                   color: AppColors.main),
                               child: Center(
                                 child: Text(
-                                  "LA",
+                                  name.substring(2).toUpperCase(),
                                   style: TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
@@ -133,11 +158,9 @@ class Dashboard extends StatelessWidget {
                         ),
                         IconButton(
                           icon: SizedBox(
-                            height: screenHeight * 0.07,
-                            width: screenWidth * 0.155,
-                            child: SvgPicture.asset('assets/icons/menu.svg',
-                                colorFilter: ColorFilter.mode(
-                                    AppColors.main, BlendMode.srcIn)),
+                            height: screenHeight * 0.08,
+                            width: screenWidth * 0.16,
+                            child: Image.asset('assets/icons/menu.png'),
                           ),
                           onPressed: () => navigateToNewScreen(
                             context,
@@ -218,7 +241,7 @@ class Dashboard extends StatelessWidget {
                                   Row(
                                     children: [
                                       GestureDetector(
-                                        onTap: () => navigateCallback(1),
+                                        onTap: () => widget.navigateCallback(1),
                                         child: const BoxTitle(
                                           icon: Icons.local_florist,
                                           title: "My Garden",
@@ -240,9 +263,14 @@ class Dashboard extends StatelessWidget {
                                   builder: (context, snapshot) {
                                     if (snapshot.connectionState ==
                                         ConnectionState.waiting) {
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          color: AppColors.contrast,
+                                      return Padding(
+                                        padding: EdgeInsets.only(
+                                            top: screenHeight * 0.05,
+                                            left: screenWidth * 0.45),
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            color: AppColors.contrast,
+                                          ),
                                         ),
                                       );
                                     } else if (snapshot.hasError) {

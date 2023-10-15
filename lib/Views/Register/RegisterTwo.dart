@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
+import 'package:plant_diary/API/Auth.dart';
 import 'package:plant_diary/Config/Colors.dart';
 import 'package:plant_diary/Utils/Navigation.dart';
+import 'package:plant_diary/Utils/ShowSnackbar.dart';
 import 'package:plant_diary/Views/Login/Login.dart';
 import 'package:plant_diary/Widgets/FormFields/StyledFormTextField.dart';
 
@@ -84,13 +86,13 @@ class RegisterTwo extends StatelessWidget {
         children: [
           StyledFormTextField(
             controller: passwordController,
-            isHidden: false,
+            isHidden: true,
             icon: Icons.person,
             hintText: 'Password',
           ),
           StyledFormTextField(
             controller: confirmPasswordController,
-            isHidden: false,
+            isHidden: true,
             icon: Icons.email,
             hintText: 'Confirm Password',
           ),
@@ -98,7 +100,19 @@ class RegisterTwo extends StatelessWidget {
             width: double.infinity,
             height: marginY * 1.4,
             child: ElevatedButton(
-              onPressed: () => {},
+              onPressed: () {
+                var password = passwordController.text.trim();
+                if (password.length < 6) {
+                  showSnackBar("Password must be longer than 5 characters");
+                  return;
+                }
+                if (confirmPasswordController.text.trim() != password) {
+                  showSnackBar("Password does not match");
+                  return;
+                }
+
+                signUpWithEmailAndPassword(context, email, password, name);
+              },
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white60,
                 backgroundColor: AppColors.main,

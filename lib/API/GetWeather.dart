@@ -33,6 +33,14 @@ IconData getWeatherIcon(String weatherConditionCode) {
   }
 }
 
+class WeatherDisplay {
+  WeatherDisplay(
+      {required this.weather, required this.color, required this.icon});
+  Weather weather;
+  Color color;
+  IconData icon;
+}
+
 Future<Widget> getWeather() async {
   try {
     var location = await getLocation();
@@ -40,17 +48,30 @@ Future<Widget> getWeather() async {
     Weather weather = await wf.currentWeatherByLocation(
         location.latitude, location.longitude);
 
+    List<Weather> weathers = await wf.fiveDayForecastByLocation(
+        location.latitude, location.longitude);
+
+    List<Weather> weathersFiltered = weathers
+        .where((element) => element.date!.hour == DateTime(2020, 1, 1).hour)
+        .toList();
+
+    weathersFiltered.insert(0, weather);
+
+    List<WeatherDisplay> displays = weathersFiltered.asMap().entries.map((e) {
+      int index = e.key;
+      Weather item = e.value;
+
+      Color color = index == 0
+          ? AppColors.contrast
+          : AppColors.contrast.withOpacity(0.75);
+      IconData icon = getWeatherIcon(item.weatherIcon!);
+
+      return WeatherDisplay(weather: item, color: color, icon: icon);
+    }).toList();
+
     return WeatherInfo(
-      iconData: getWeatherIcon(weather.weatherIcon!),
-      temperature: weather.temperature?.celsius ?? 0.0,
-      date: weather.date ?? DateTime.now(),
-      humidity: weather.humidity ?? 0.0,
-      windSpeed: weather.windSpeed ?? 0.0,
-      rainLast3Hours: weather.rainLast3Hours ?? 0.0,
-      cloudiness: weather.cloudiness ?? 0.0,
-      weatherDescription: weather.weatherDescription ?? "",
-      fontSize: 18,
-      fontColor: AppColors.contrast,
+      weatherList: displays,
+      fontSize: 15,
     );
   } catch (e) {
     return Center(

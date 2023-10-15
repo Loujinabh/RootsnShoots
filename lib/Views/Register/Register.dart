@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:plant_diary/Config/Colors.dart';
 import 'package:plant_diary/Utils/Navigation.dart';
+import 'package:plant_diary/Utils/ShowSnackbar.dart';
 import 'package:plant_diary/Views/Login/Login.dart';
 import 'package:plant_diary/Views/Register/RegisterTwo.dart';
 import 'package:plant_diary/Widgets/FormFields/StyledFormTextField.dart';
 
 class Register extends StatelessWidget {
   Register({Key? key}) : super(key: key);
-  final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +78,6 @@ class Register extends StatelessWidget {
         vertical: marginY,
       ),
       child: Form(
-        key: formKey,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -87,32 +86,39 @@ class Register extends StatelessWidget {
               isHidden: false,
               icon: Icons.person,
               hintText: 'Name',
-              validator: (name) => name != null ? "Enter a name" : null,
             ),
             StyledFormTextField(
               controller: emailController,
               isHidden: false,
               icon: Icons.email,
               hintText: 'Email',
-              validator: (email) =>
-                  email != null && EmailValidator.validate(email, true, true)
-                      ? "Enter a valid email"
-                      : null,
             ),
             SizedBox(
               width: double.infinity,
               height: marginY * 1.4,
               child: ElevatedButton(
                 onPressed: () {
-                  if (formKey.currentState!.validate()) {
-                    navigateToNewScreen(
-                      context,
-                      RegisterTwo(
-                        name: nameController.text,
-                        email: emailController.text,
-                      ),
-                    );
+                  var name = nameController.text.trim();
+                  var email = emailController.text.trim();
+                  var emailValid = EmailValidator.validate(email, true, true);
+
+                  if (name.length < 2) {
+                    showSnackBar("Enter a valid name");
+                    return;
                   }
+
+                  if (!emailValid) {
+                    showSnackBar("Enter a valid email");
+                    return;
+                  }
+
+                  navigateToNewScreen(
+                    context,
+                    RegisterTwo(
+                      name: name,
+                      email: email,
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.white60,

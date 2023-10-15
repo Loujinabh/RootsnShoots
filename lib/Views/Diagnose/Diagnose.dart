@@ -1,5 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:plant_diary/API/DataModels/SearchPlantModel.dart';
 import 'package:plant_diary/API/PlantIdApi.dart';
@@ -24,7 +24,7 @@ class Diagnose extends StatefulWidget {
 }
 
 class _DiagnoseState extends State<Diagnose> {
-  final String name = "Loujin AbuHejleh";
+  String name = "-----";
 
   String base64Image = "";
   bool showPlus = false;
@@ -37,8 +37,16 @@ class _DiagnoseState extends State<Diagnose> {
   @override
   void initState() {
     super.initState();
+    setName();
     plantIdentity = Future(() => PlantIdentity(name: "", images: []));
     plantHealth = Future(() => PlantHealth(diseases: [], health: -1.0));
+  }
+
+  void setName() async {
+    var tempName = FirebaseAuth.instance.currentUser!.displayName;
+    setState(() {
+      name = tempName!;
+    });
   }
 
   Future<void> identify() async {
@@ -143,7 +151,7 @@ class _DiagnoseState extends State<Diagnose> {
                                     color: AppColors.main),
                                 child: Center(
                                   child: Text(
-                                    "LA",
+                                    name.substring(2).toUpperCase(),
                                     style: TextStyle(
                                         fontSize: 24,
                                         fontWeight: FontWeight.bold,
@@ -195,9 +203,11 @@ class _DiagnoseState extends State<Diagnose> {
                             icon: SizedBox(
                               height: screenHeight * 0.07,
                               width: screenWidth * 0.155,
-                              child: SvgPicture.asset('assets/icons/menu.svg',
-                                  colorFilter: ColorFilter.mode(
-                                      AppColors.main, BlendMode.srcIn)),
+                              child: SizedBox(
+                                height: screenHeight * 0.08,
+                                width: screenWidth * 0.16,
+                                child: Image.asset('assets/icons/menu.png'),
+                              ),
                             ),
                             onPressed: () => navigateToNewScreen(
                               context,

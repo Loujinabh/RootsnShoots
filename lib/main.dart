@@ -18,9 +18,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       scaffoldMessengerKey: Keys.messengerKey,
       navigatorKey: Keys.navigatorKey,
-      title: 'Plant Diary',
+      title: 'Roots & Shoots',
       theme: ThemeData(
         fontFamily: 'quick',
       ),

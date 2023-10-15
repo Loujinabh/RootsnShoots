@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:plant_diary/API/Auth.dart';
@@ -14,9 +15,30 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  final String name = "Loujin AbuHejleh";
-  final String email = "loujin.abh@gmail.com";
+  String name = "-------";
+  String email = "-------";
   bool notificationsSwitch = false;
+
+  @override
+  void initState() {
+    super.initState();
+    setName();
+    setEmail();
+  }
+
+  void setEmail() async {
+    var tempEmail = FirebaseAuth.instance.currentUser!.email;
+    setState(() {
+      email = tempEmail!;
+    });
+  }
+
+  void setName() async {
+    var tempName = FirebaseAuth.instance.currentUser!.displayName;
+    setState(() {
+      name = tempName!;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +140,7 @@ class _SettingsState extends State<Settings> {
                                     ),
                                     child: Center(
                                       child: Text(
-                                        "LA",
+                                        name.substring(2).toUpperCase(),
                                         style: TextStyle(
                                           fontSize: screenHeight * 0.058,
                                           fontWeight: FontWeight.bold,
